@@ -9,30 +9,24 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // ─── Middleware ───────────────────────────────────────────────
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000'
+}));
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // ─── Database Connection ──────────────────────────────────────
-mongoose.connect(
-    process.env.MONGODB_URI || 'mongodb://localhost:27017/ai_event_management',
-    { useNewUrlParser: true, useUnifiedTopology: true }
-)
-.then(() => console.log('✅ MongoDB connected'))
-.catch(err => console.error('❌ MongoDB connection error:', err));
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('✅ MongoDB connected'))
+    .catch(err => console.error('❌ MongoDB error:', err));
 
-// ─── Routes ───────────────────────────────────────────────────
-app.use('/api/chatbot',  require('./src/routes/chatbot'));
-app.use('/api/payments', require('./src/routes/payments'));
-app.use('/api',          require('./routes'));
-
-// ─── Health Check ─────────────────────────────────────────────
+// ─── Health Check (Render needs this to know app is alive) ────
 app.get('/', (req, res) => {
-    res.json({ status: 'EventIQ API is running', port: PORT });
+    res.json({ status: '✅ EventIQ API is running', port: PORT });
 });
 
 // ─── Start Server ─────────────────────────────────────────────
 app.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
 });
