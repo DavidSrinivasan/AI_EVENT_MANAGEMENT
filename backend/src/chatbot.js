@@ -1,50 +1,53 @@
 const express = require('express');
+const axios = require('axios');
 const router = express.Router();
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-const SYSTEM_PROMPT = `You are EventIQ's friendly AI assistant. You help event organizers and attendees with event planning, ticketing, venue questions, schedules, and general event management advice. Be helpful, friendly, and keep answers short and clear.`;
+const SYSTEM_PROMPT = `You are EventIQ's intelligent AI assistant for a global event management platform. You help users with:
+- Finding and recommending venues worldwide based on location, capacity, budget, event type
+- Event planning advice (timelines, checklists, budgets)
+- Answering questions about venue features, pricing, availability
+- ROI and financial analysis for events
+- General event management best practices
+Be helpful, specific, and concise. When recommending venues mention realistic options for the city/country mentioned.`;
 
 router.post('/chat', async (req, res) => {
     const { message, messages } = req.body;
 
-    // If no Groq key yet, return a friendly default reply
     if (!process.env.GROQ_API_KEY) {
-        return res.json({
-            reply: "Hi! I'm the EventIQ AI assistant. I'm being set up right now — please check back soon!"
-        });
+        return res.json({ reply: "AI service not configured. Please add GROQ_API_KEY to Render environment variables." });
     }
 
     try {
-        const response = await fetch(GROQ_API_URL, {
-            method: 'POST',
+        const history = (messages || []).slice(-8).map(m => ({
+            role: m.role === 'user' ? 'user' : 'assistant',
+            content: m.content
+        }));
+
+        const response = await axios.post(GROQ_API_URL, {
+            model: 'llama3-8b-8192',
+            messages: [
+                { role: 'system', content: SYSTEM_PROMPT },
+                ...history,
+                { role: 'user', content: message || 'Hello' }
+            ],
+            max_tokens: 200,
+            temperature: 0.7
+        }, {
             headers: {
                 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                model: 'llama3-8b-8192',
-                messages: [
-                    { role: 'system', content: SYSTEM_PROMPT },
-                    ...(messages || []),
-                    { role: 'user', content: message || 'Hello' }
-                ],
-                max_tokens: 200,
-                temperature: 0.7
-            })
+            timeout: 20000
         });
 
-        const data = await response.json();
+        const reply = response.data?.choices?.[0]?.message?.content;
+        res.json({ reply: reply || "I couldn't generate a response. Please try again!" });
 
-        if (data.choices && data.choices[0]) {
-            res.json({ reply: data.choices[0].message.content });
-        } else {
-            res.json({ reply: "I'm having trouble right now. Please try again in a moment!" });
-        }
-
-    } catch (error) {
-        console.error('Groq error:', error);
-        res.json({ reply: "Sorry, I'm temporarily unavailable. Please try again!" });
+    } catch (err) {
+        console.error('Groq error:', err?.response?.data || err.message);
+        res.json({ reply: "I'm temporarily unavailable. Please try again in a moment!" });
     }
 });
 
