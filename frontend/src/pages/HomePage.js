@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navbar, Chatbot, VenueMap } from '../components/shared';
 import { C, venues, wakeBackend } from '../utils';
-
 function useReveal() {
   const ref = useRef(null);
   const [v, setV] = useState(false);
@@ -13,12 +12,10 @@ function useReveal() {
   }, []);
   return [ref, v];
 }
-
 function Reveal({ children, delay = 0 }) {
   const [ref, v] = useReveal();
   return <div ref={ref} style={{ opacity: v ? 1 : 0, transform: v ? 'none' : 'translateY(32px)', transition: `opacity .7s ${delay}s ease, transform .7s ${delay}s ease` }}>{children}</div>;
 }
-
 function Count({ to, suffix = '' }) {
   const [n, setN] = useState(0);
   const [ref, v] = useReveal();
@@ -31,7 +28,6 @@ function Count({ to, suffix = '' }) {
   }, [v, to]);
   return <span ref={ref}>{n}{suffix}</span>;
 }
-
 export default function HomePage() {
   const nav = useNavigate();
   const [heroIn, setHeroIn] = useState(false);
@@ -64,9 +60,7 @@ export default function HomePage() {
         .tag{background:rgba(99,102,241,.12);color:#a5b4fc;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500}
         @media(max-width:768px){.hero-h1{font-size:2.4rem!important}.grid-2{grid-template-columns:1fr!important}.grid-3{grid-template-columns:1fr!important}.grid-4{grid-template-columns:1fr 1fr!important}.hide-mobile{display:none!important}}
       `}</style>
-
       <Navbar />
-
       {/* ── HERO ── */}
       <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '100px 5% 60px', position: 'relative', overflow: 'hidden' }}>
         {[{ top: '-15%', left: '-8%', c: 'rgba(99,102,241,.18)', d: '0s' }, { top: '10%', right: '-12%', c: 'rgba(139,92,246,.14)', d: '2s' }, { bottom: '-10%', left: '35%', c: 'rgba(6,182,212,.1)', d: '4s' }].map((o, i) => (
@@ -79,27 +73,22 @@ export default function HomePage() {
             <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#34d399', display: 'inline-block', animation: 'shimmer 2s infinite' }}></span>
             AI-Powered · 12,000+ Venues Worldwide · Completely Free
           </div>
-
           <h1 className="hero-h1" style={{ fontSize: 'clamp(2.8rem,6.5vw,5.5rem)', fontWeight: 900, lineHeight: 1.04, letterSpacing: '-0.04em', marginBottom: '1.5rem', opacity: heroIn ? 1 : 0, transform: heroIn ? 'none' : 'translateY(28px)', transition: 'all .7s .1s ease' }}>
             Discover & Manage<br />
             <span style={{ background: 'linear-gradient(135deg,#818cf8,#a78bfa,#38bdf8)', backgroundSize: '200%', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', animation: 'gradShift 5s ease infinite' }}>Events Worldwide</span>
           </h1>
-
           <p style={{ fontSize: 'clamp(.95rem,1.8vw,1.2rem)', color: C.muted2, maxWidth: 560, margin: '0 auto 2.5rem', lineHeight: 1.78, opacity: heroIn ? 1 : 0, transform: heroIn ? 'none' : 'translateY(28px)', transition: 'all .7s .2s ease' }}>
             Find perfect venues, get AI recommendations, analyze ROI, and manage events globally — all in one powerful free platform.
           </p>
-
           {/* Search bar */}
           <div style={{ opacity: heroIn ? 1 : 0, transform: heroIn ? 'none' : 'translateY(28px)', transition: 'all .7s .3s ease', maxWidth: 580, margin: '0 auto 2rem', display: 'flex', gap: 8, background: 'rgba(255,255,255,.06)', border: `1px solid ${C.border}`, borderRadius: 16, padding: 8 }}>
             <input value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && nav(`/venues?q=${search}`)} placeholder="🔍  Search venues by city, country or name…" style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: C.text, fontSize: 14, padding: '6px 12px', fontFamily: 'inherit' }} />
             <button className="btn-p" style={{ padding: '10px 22px', fontSize: 14, borderRadius: 10 }} onClick={() => nav(`/venues?q=${search}`)}>Search</button>
           </div>
-
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap', opacity: heroIn ? 1 : 0, transition: 'all .7s .35s ease' }}>
             <button className="btn-p" style={{ padding: '13px 26px', fontSize: 15 }} onClick={() => nav('/venues')}>Find Venues →</button>
             <button className="btn-o" style={{ padding: '13px 26px', fontSize: 15 }} onClick={() => nav('/create-event')}>Create Event</button>
           </div>
-
           {/* Stats */}
           <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1rem', marginTop: '4rem', opacity: heroIn ? 1 : 0, transition: 'all .7s .45s ease' }}>
             {[['12', 'K+', 'Venues Worldwide'], ['98', '%', 'Satisfaction Rate'], ['140', '+', 'Countries Covered'], ['50', 'K+', 'Events Hosted']].map(([n, s, l]) => (
@@ -111,7 +100,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* ── WORLD MAP ── */}
       <section style={{ padding: '80px 5%' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -142,7 +130,6 @@ export default function HomePage() {
           )}
         </div>
       </section>
-
       {/* ── FEATURES ── */}
       <section style={{ padding: '80px 5%', background: 'rgba(255,255,255,.01)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -163,7 +150,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* ── FEATURED VENUES ── */}
       <section style={{ padding: '80px 5%' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -205,7 +191,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* ── HOW IT WORKS ── */}
       <section style={{ padding: '80px 5%', background: 'rgba(255,255,255,.01)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -228,7 +213,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* ── CTA ── */}
       <section style={{ padding: '80px 5%' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
@@ -245,7 +229,6 @@ export default function HomePage() {
           </Reveal>
         </div>
       </section>
-
       {/* ── FOOTER ── */}
       <footer style={{ padding: '3rem 5% 2rem', borderTop: `1px solid ${C.border2}` }}>
         <div className="grid-2" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
