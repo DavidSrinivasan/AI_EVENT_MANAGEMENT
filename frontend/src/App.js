@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import VenueSearchPage from './pages/VenueSearchPage';
-import { VenueDetailPage, CreateEventPage, DashboardPage, ProfilePage } from './pages/AllPages';
+import { VenueDetailPage, CreateEventPage, DashboardPage, ProfilePage, VendorsPage, AuthPage } from './pages/AllPages';
 
 export default function App() {
   return (
@@ -14,6 +14,8 @@ export default function App() {
         <Route path="/create-event" element={<CreateEventPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/vendors" element={<VendorsPage />} />
+        <Route path="/auth" element={<AuthPage />} />
       </Routes>
     </Router>
   );
