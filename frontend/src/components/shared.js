@@ -1,11 +1,59 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { C, API, wakeBackend } from '../utils';
+import { C, API } from '../utils';
 
-/* ── Navbar ─────────────────────────────────────────────── */
+const NAV_LINKS = [
+  { label: 'Home', path: '/' },
+  { label: 'Find Venues', path: '/venues' },
+  { label: 'Create Event', path: '/create-event' },
+  { label: 'Dashboard', path: '/dashboard' },
+  { label: 'Vendors', path: '/vendors' },
+];
+
+const gs = `
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #05060f; color: #f0f4ff; overflow-x: hidden; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #05060f; }
+  ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 2px; }
+  .btn-primary { background: linear-gradient(135deg,#6366f1,#8b5cf6); color: #fff; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .2s; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99,102,241,.45); }
+  .btn-secondary { background: rgba(255,255,255,.05); color: #94a3b8; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all .2s; }
+  .btn-secondary:hover { border-color: rgba(99,102,241,.5); color: #c7d2fe; background: rgba(99,102,241,.06); }
+  .card { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); border-radius: 18px; transition: all .3s; }
+  .card:hover { background: rgba(99,102,241,.05); border-color: rgba(99,102,241,.3); transform: translateY(-3px); }
+  .inp { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 10px 14px; color: #f0f4ff; font-size: 14px; font-family: inherit; outline: none; transition: border-color .2s; width: 100%; }
+  .inp:focus { border-color: rgba(99,102,241,.6); }
+  .tag { background: rgba(99,102,241,.1); color: #a5b4fc; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; display: inline-block; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes gradShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+  @media (max-width: 768px) {
+    .hide-mobile { display: none !important; }
+    .nav-links { display: none !important; }
+  }
+`;
+
+/* ── Global Styles injector ── */
+export function GlobalStyles() {
+  useEffect(() => {
+    if (!document.getElementById('eq-global')) {
+      const s = document.createElement('style');
+      s.id = 'eq-global'; s.textContent = gs;
+      document.head.appendChild(s);
+    }
+  }, []);
+  return null;
+}
+
+/* ── Navbar with IQ chatbot button ── */
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const nav = useNavigate();
   const loc = useLocation();
 
@@ -15,54 +63,56 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', fn);
   }, []);
 
-  const links = [
-    { label: 'Home', path: '/' },
-    { label: 'Find Venues', path: '/venues' },
-    { label: 'Create Event', path: '/create-event' },
-    { label: 'Dashboard', path: '/dashboard' },
-  ];
-
   return (
     <>
-      <style>{`
-        .nav-a{color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;transition:color .2s;cursor:pointer;background:none;border:none;font-family:inherit;padding:0}
-        .nav-a:hover,.nav-a.active{color:#f0f4ff}
-        .nav-a.active{color:#a5b4fc}
-      `}</style>
-      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000, height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 5%', background: scrolled ? 'rgba(5,6,15,.97)' : 'rgba(5,6,15,.7)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${scrolled ? C.border : 'transparent'}`, transition: 'all .3s' }}>
-        <div style={{ fontSize: '1.3rem', fontWeight: 900, letterSpacing: '-0.03em', cursor: 'pointer' }} onClick={() => nav('/')}>
+      <GlobalStyles />
+      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000, height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4%', background: scrolled ? 'rgba(5,6,15,.98)' : 'rgba(5,6,15,.75)', backdropFilter: 'blur(24px)', borderBottom: `1px solid ${scrolled ? 'rgba(99,102,241,.2)' : 'transparent'}`, transition: 'all .3s' }}>
+        {/* Logo */}
+        <div style={{ fontSize: '1.35rem', fontWeight: 900, letterSpacing: '-0.03em', cursor: 'pointer', flexShrink: 0 }} onClick={() => nav('/')}>
           Event<span style={{ background: 'linear-gradient(135deg,#6366f1,#a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>IQ</span>
         </div>
 
-        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-          {links.map(l => (
-            <button key={l.path} className={`nav-a${loc.pathname === l.path ? ' active' : ''}`} onClick={() => nav(l.path)}>{l.label}</button>
+        {/* Links */}
+        <div className="nav-links" style={{ display: 'flex', gap: '1.75rem', alignItems: 'center' }}>
+          {NAV_LINKS.map(l => (
+            <button key={l.path} onClick={() => nav(l.path)} style={{ color: loc.pathname === l.path ? '#a5b4fc' : '#64748b', background: 'none', border: 'none', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', transition: 'color .2s', borderBottom: loc.pathname === l.path ? '2px solid #6366f1' : '2px solid transparent', paddingBottom: 2 }}>
+              {l.label}
+            </button>
           ))}
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          <button onClick={() => nav('/profile')} style={{ background: 'rgba(255,255,255,.06)', border: `1px solid ${C.border2}`, borderRadius: 10, padding: '8px 16px', color: C.muted2, fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Profile</button>
-          <button onClick={() => nav('/create-event')} style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', border: 'none', borderRadius: 10, padding: '9px 18px', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 16px rgba(99,102,241,.35)' }}>+ Create Event</button>
+        {/* Right actions */}
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexShrink: 0 }}>
+          {/* IQ Chatbot button */}
+          <button onClick={() => setChatOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 16px', background: chatOpen ? 'linear-gradient(135deg,#6366f1,#8b5cf6)' : 'rgba(99,102,241,.1)', border: '1px solid rgba(99,102,241,.35)', borderRadius: 10, cursor: 'pointer', fontFamily: 'inherit', transition: 'all .2s' }}>
+            <div style={{ width: 22, height: 22, borderRadius: 6, background: chatOpen ? 'rgba(255,255,255,.25)' : 'linear-gradient(135deg,#6366f1,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900, color: '#fff', letterSpacing: '-0.05em', flexShrink: 0 }}>IQ</div>
+            <span style={{ fontSize: 13, fontWeight: 600, color: chatOpen ? '#fff' : '#a5b4fc' }}>AI Assistant</span>
+          </button>
+          <button className="btn-secondary" style={{ padding: '7px 14px', fontSize: 13 }} onClick={() => nav('/profile')}>Profile</button>
+          <button className="btn-primary" style={{ padding: '8px 16px', fontSize: 13 }} onClick={() => nav('/create-event')}>+ Create Event</button>
         </div>
       </nav>
+
+      {/* IQ Chatbot Panel */}
+      {chatOpen && <ChatPanel onClose={() => setChatOpen(false)} />}
     </>
   );
 }
 
-/* ── Chatbot ─────────────────────────────────────────────── */
-export function Chatbot() {
-  const [open, setOpen] = useState(false);
-  const [msgs, setMsgs] = useState([{ r: 'bot', t: "👋 Hi! I'm EventIQ's AI assistant. I can help you find venues, plan events, estimate budgets, and more. What are you planning?" }]);
+/* ── IQ Chat Panel (slides down from navbar) ── */
+function ChatPanel({ onClose }) {
+  const [msgs, setMsgs] = useState([
+    { r: 'bot', t: "Hello! I'm EventIQ's AI assistant. I can help you find venues worldwide, plan events, estimate budgets, and analyze ROI. What are you working on?" }
+  ]);
   const [inp, setInp] = useState('');
   const [busy, setBusy] = useState(false);
-  const [waking, setWaking] = useState(false);
+  const [waking, setWaking] = useState(true);
   const end = useRef(null);
 
   useEffect(() => { end.current?.scrollIntoView({ behavior: 'smooth' }); }, [msgs]);
-
   useEffect(() => {
-    if (open) { setWaking(true); fetch(`${API}/`).finally(() => setWaking(false)); }
-  }, [open]);
+    fetch(`${API}/`).finally(() => setWaking(false));
+  }, []);
 
   const send = async (text) => {
     const msg = text || inp.trim();
@@ -72,91 +122,94 @@ export function Chatbot() {
     setInp(''); setBusy(true);
     try {
       const res = await fetch(`${API}/api/chatbot/chat`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: msg, messages: history }),
-        signal: AbortSignal.timeout(25000)
+        signal: AbortSignal.timeout(30000)
       });
-      if (!res.ok) throw new Error('bad response');
+      if (!res.ok) throw new Error('Server error');
       const d = await res.json();
       setMsgs(p => [...p, { r: 'bot', t: d.reply }]);
-    } catch {
-      setMsgs(p => [...p, { r: 'bot', t: waking ? "Server is warming up (free tier). Wait 30s and try again!" : "Connection issue — try again!" }]);
+    } catch (e) {
+      setMsgs(p => [...p, { r: 'bot', t: e.name === 'AbortError' ? 'The server is warming up (free tier takes ~30s). Please try again!' : 'Connection error. Please check your internet and try again.' }]);
     }
     setBusy(false);
   };
 
-  const suggestions = ['Best venues in Singapore', 'Plan a 500-person conference', 'Budget for a wedding?', 'Venues in London under $10k'];
+  const suggestions = ['Best conference venues in Singapore', 'Plan a 300-person corporate event', 'Budget breakdown for a wedding', 'Top venues in Dubai under $15k'];
 
   return (
-    <>
-      <style>{`
-        @keyframes dotBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-        @keyframes statusPulse{0%,100%{opacity:1}50%{opacity:.4}}
-        .chat-inp:focus{border-color:rgba(99,102,241,.7)!important;outline:none}
-        .msg-bubble{transition:transform .15s}
-        .msg-bubble:hover{transform:scale(1.01)}
-      `}</style>
-      <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, fontFamily: 'Inter,sans-serif' }}>
-        {open && (
-          <div style={{ width: 370, marginBottom: 12, borderRadius: 22, overflow: 'hidden', background: 'linear-gradient(180deg,#0d0f23 0%,#080a18 100%)', border: '1px solid rgba(99,102,241,.35)', boxShadow: '0 40px 100px rgba(0,0,0,.8)', animation: 'slideUp .25s ease' }}>
-            <style>{`@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}`}</style>
-
-            {/* Header */}
-            <div style={{ background: 'linear-gradient(135deg,#1e1b4b,#2d1f6b)', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, boxShadow: '0 4px 16px rgba(99,102,241,.5)', flexShrink: 0 }}>🤖</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#f0f4ff' }}>EventIQ AI Assistant</div>
-                <div style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 5, color: waking ? '#fbbf24' : '#34d399' }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: waking ? '#fbbf24' : '#34d399', display: 'inline-block', animation: 'statusPulse 1.5s infinite' }}></span>
-                  {waking ? 'Connecting…' : 'Online · Groq Llama 3'}
-                </div>
-              </div>
-              <button onClick={() => setOpen(false)} style={{ background: 'rgba(255,255,255,.1)', border: 'none', color: '#a5b4fc', cursor: 'pointer', width: 28, height: 28, borderRadius: '50%', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+    <div style={{ position: 'fixed', top: 64, right: 20, width: 420, zIndex: 999, animation: 'slideIn .25s ease' }}>
+      <div style={{ background: 'rgba(10,12,28,.98)', border: '1px solid rgba(99,102,241,.3)', borderRadius: 18, overflow: 'hidden', boxShadow: '0 40px 100px rgba(0,0,0,.7)' }}>
+        {/* Header */}
+        <div style={{ background: 'linear-gradient(135deg,#1e1b4b,#2d1f6b)', padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 900, color: '#fff', letterSpacing: '-0.05em', flexShrink: 0, boxShadow: '0 4px 12px rgba(99,102,241,.5)' }}>IQ</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#f0f4ff' }}>EventIQ AI Assistant</div>
+            <div style={{ fontSize: 11, color: waking ? '#fbbf24' : '#34d399', display: 'flex', alignItems: 'center', gap: 5 }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: waking ? '#fbbf24' : '#34d399', display: 'inline-block', animation: 'pulse 1.5s infinite' }}></span>
+              {waking ? 'Connecting to server...' : 'Online · GPT-4o-mini'}
             </div>
+          </div>
+          <button onClick={onClose} style={{ background: 'rgba(255,255,255,.1)', border: 'none', color: '#a5b4fc', cursor: 'pointer', width: 30, height: 30, borderRadius: '50%', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>x</button>
+        </div>
 
-            {/* Messages */}
-            <div style={{ height: 310, overflowY: 'auto', padding: '14px 14px 8px', display: 'flex', flexDirection: 'column', gap: 10, scrollbarWidth: 'thin', scrollbarColor: '#6366f1 transparent' }}>
-              {msgs.map((m, i) => (
-                <div key={i} className="msg-bubble" style={{ maxWidth: '88%', padding: '10px 14px', borderRadius: m.r === 'user' ? '18px 4px 18px 18px' : '4px 18px 18px 18px', background: m.r === 'user' ? 'linear-gradient(135deg,#6366f1,#8b5cf6)' : 'rgba(255,255,255,.05)', color: '#f0f4ff', fontSize: 13, lineHeight: 1.65, alignSelf: m.r === 'user' ? 'flex-end' : 'flex-start', border: m.r === 'bot' ? '1px solid rgba(255,255,255,.07)' : 'none', whiteSpace: 'pre-wrap' }}>{m.t}</div>
-              ))}
-              {busy && (
-                <div style={{ alignSelf: 'flex-start', padding: '12px 16px', borderRadius: '4px 18px 18px 18px', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.07)', display: 'flex', gap: 5 }}>
-                  {[0,1,2].map(i => <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: '#6366f1', display: 'inline-block', animation: `dotBounce 1s ${i*.2}s infinite` }}></span>)}
-                </div>
-              )}
-              <div ref={end} />
+        {/* Messages */}
+        <div style={{ height: 340, overflowY: 'auto', padding: '14px', display: 'flex', flexDirection: 'column', gap: 10, scrollbarWidth: 'thin', scrollbarColor: '#6366f1 transparent' }}>
+          {msgs.map((m, i) => (
+            <div key={i} style={{ maxWidth: '88%', padding: '10px 14px', borderRadius: m.r === 'user' ? '18px 4px 18px 18px' : '4px 18px 18px 18px', background: m.r === 'user' ? 'linear-gradient(135deg,#6366f1,#8b5cf6)' : 'rgba(255,255,255,.05)', color: '#f0f4ff', fontSize: 13.5, lineHeight: 1.65, alignSelf: m.r === 'user' ? 'flex-end' : 'flex-start', border: m.r === 'bot' ? '1px solid rgba(255,255,255,.07)' : 'none', whiteSpace: 'pre-wrap', animation: 'slideIn .3s ease' }}>{m.t}</div>
+          ))}
+          {busy && (
+            <div style={{ alignSelf: 'flex-start', padding: '12px 16px', borderRadius: '4px 18px 18px 18px', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.07)', display: 'flex', gap: 5 }}>
+              {[0, 1, 2].map(i => <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: '#6366f1', display: 'inline-block', animation: `pulse 1s ${i * .2}s infinite` }}></span>)}
             </div>
+          )}
+          <div ref={end} />
+        </div>
 
-            {/* Suggestions */}
-            {msgs.length <= 1 && (
-              <div style={{ padding: '0 12px 8px', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {suggestions.map(s => (
-                  <button key={s} onClick={() => send(s)} style={{ background: 'rgba(99,102,241,.1)', border: '1px solid rgba(99,102,241,.25)', borderRadius: 20, padding: '4px 10px', fontSize: 11, color: '#a5b4fc', cursor: 'pointer', fontFamily: 'inherit', transition: 'all .2s' }} onMouseEnter={e => e.target.style.background='rgba(99,102,241,.2)'} onMouseLeave={e => e.target.style.background='rgba(99,102,241,.1)'}>{s}</button>
-                ))}
-              </div>
-            )}
-
-            {/* Input */}
-            <div style={{ padding: '10px 12px 14px', borderTop: '1px solid rgba(255,255,255,.05)', display: 'flex', gap: 8 }}>
-              <input className="chat-inp" value={inp} onChange={e => setInp(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()} placeholder="Ask about venues, budgets, planning…" style={{ flex: 1, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(99,102,241,.3)', borderRadius: 14, padding: '10px 14px', color: '#f0f4ff', fontSize: 13, fontFamily: 'inherit', transition: 'border-color .2s' }} />
-              <button onClick={() => send()} disabled={busy || !inp.trim()} style={{ width: 44, height: 44, borderRadius: 14, background: inp.trim() ? 'linear-gradient(135deg,#6366f1,#8b5cf6)' : 'rgba(99,102,241,.2)', border: 'none', color: '#fff', cursor: inp.trim() ? 'pointer' : 'not-allowed', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .2s', flexShrink: 0 }}>→</button>
-            </div>
+        {/* Quick suggestions */}
+        {msgs.length <= 1 && (
+          <div style={{ padding: '0 14px 10px', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {suggestions.map(s => (
+              <button key={s} onClick={() => send(s)} style={{ background: 'rgba(99,102,241,.1)', border: '1px solid rgba(99,102,241,.25)', borderRadius: 20, padding: '5px 12px', fontSize: 12, color: '#a5b4fc', cursor: 'pointer', fontFamily: 'inherit', transition: 'all .2s' }} onMouseEnter={e => e.target.style.background = 'rgba(99,102,241,.22)'} onMouseLeave={e => e.target.style.background = 'rgba(99,102,241,.1)'}>{s}</button>
+            ))}
           </div>
         )}
 
-        <button onClick={() => setOpen(o => !o)} style={{ width: 60, height: 60, borderRadius: '50%', background: open ? 'linear-gradient(135deg,#ef4444,#dc2626)' : 'linear-gradient(135deg,#6366f1,#8b5cf6)', border: 'none', cursor: 'pointer', fontSize: 24, boxShadow: `0 8px 32px ${open ? 'rgba(239,68,68,.4)' : 'rgba(99,102,241,.5)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 'auto', transition: 'all .3s' }} onMouseEnter={e => e.currentTarget.style.transform='scale(1.1)'} onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>
-          {open ? '✕' : '🤖'}
-        </button>
+        {/* Input */}
+        <div style={{ padding: '10px 14px 14px', borderTop: '1px solid rgba(255,255,255,.05)', display: 'flex', gap: 8 }}>
+          <input className="inp" value={inp} onChange={e => setInp(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()} placeholder="Ask about venues, budgets, event planning..." style={{ fontSize: 13 }} />
+          <button onClick={() => send()} disabled={busy || !inp.trim()} className="btn-primary" style={{ width: 44, height: 44, fontSize: 18, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, opacity: inp.trim() ? 1 : 0.5 }}>
+            <span style={{ fontSize: 16 }}>&#8594;</span>
+          </button>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 
-/* ── Leaflet Map ─────────────────────────────────────────── */
+/* ── Venue Map (Leaflet + OpenStreetMap) ── */
 export function VenueMap({ venues = [], center = [20, 0], zoom = 2, height = 420, onVenueClick }) {
   const mapRef = useRef(null);
   const instanceRef = useRef(null);
   const markersRef = useRef([]);
+
+  const buildMarkers = (map, venueList) => {
+    markersRef.current.forEach(m => m.remove());
+    markersRef.current = [];
+    venueList.forEach(v => {
+      const icon = window.L.divIcon({
+        html: `<div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 4px 12px rgba(99,102,241,.5);cursor:pointer;border:1px solid rgba(255,255,255,.2)">${v.name.split(' ').slice(0, 2).join(' ')}</div>`,
+        className: '',
+        iconAnchor: [0, 0]
+      });
+      const marker = window.L.marker([v.lat, v.lng], { icon })
+        .addTo(map)
+        .bindPopup(`<div style="font-family:Inter,sans-serif;min-width:180px"><img src="${v.image}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:8px" onerror="this.style.display='none'"/><b style="font-size:13px;display:block;margin-bottom:2px">${v.name}</b><span style="color:#666;font-size:12px">${v.city}, ${v.country}</span><br><span style="color:#6366f1;font-size:12px;font-weight:600">★${v.rating} &nbsp;|&nbsp; Cap. ${v.capacity.toLocaleString()}</span></div>`);
+      if (onVenueClick) marker.on('click', () => onVenueClick(v));
+      markersRef.current.push(marker);
+    });
+  };
 
   useEffect(() => {
     if (!document.getElementById('leaflet-css')) {
@@ -167,42 +220,31 @@ export function VenueMap({ venues = [], center = [20, 0], zoom = 2, height = 420
     }
     const init = () => {
       if (instanceRef.current || !mapRef.current) return;
-      instanceRef.current = window.L.map(mapRef.current, { zoomControl: true }).setView(center, zoom);
-      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(instanceRef.current);
-      addMarkers();
-    };
-    const addMarkers = () => {
-      if (!instanceRef.current) return;
-      markersRef.current.forEach(m => m.remove());
-      markersRef.current = [];
-      venues.forEach(v => {
-        const icon = window.L.divIcon({ html: `<div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;padding:4px 8px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 4px 12px rgba(99,102,241,.5);cursor:pointer">${v.name.split(' ').slice(0,2).join(' ')}</div>`, className: '', iconAnchor: [0, 0] });
-        const marker = window.L.marker([v.lat, v.lng], { icon })
-          .addTo(instanceRef.current)
-          .bindPopup(`<div style="font-family:Inter,sans-serif;padding:4px"><b style="font-size:13px">${v.name}</b><br><span style="color:#666;font-size:12px">${v.city}, ${v.country}</span><br><span style="color:#6366f1;font-size:12px;font-weight:600">★${v.rating} · Capacity ${v.capacity.toLocaleString()}</span></div>`);
-        if (onVenueClick) marker.on('click', () => onVenueClick(v));
-        markersRef.current.push(marker);
-      });
+      const map = window.L.map(mapRef.current, { zoomControl: true }).setView(center, zoom);
+      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
+        maxZoom: 19
+      }).addTo(map);
+      instanceRef.current = map;
+      buildMarkers(map, venues);
     };
     if (!window.L) {
-      const s = document.createElement('script'); s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      const s = document.createElement('script');
+      s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
       s.onload = init; document.head.appendChild(s);
-    } else init();
-    return () => { if (instanceRef.current) { instanceRef.current.remove(); instanceRef.current = null; } };
+    } else { setTimeout(init, 100); }
+    return () => {
+      if (instanceRef.current) { instanceRef.current.remove(); instanceRef.current = null; }
+    };
   }, []);
 
   useEffect(() => {
-    if (!instanceRef.current || !window.L) return;
-    markersRef.current.forEach(m => m.remove());
-    markersRef.current = [];
-    venues.forEach(v => {
-      const icon = window.L.divIcon({ html: `<div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;padding:4px 8px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 4px 12px rgba(99,102,241,.5);cursor:pointer">${v.name.split(' ').slice(0,2).join(' ')}</div>`, className: '', iconAnchor: [0, 0] });
-      const marker = window.L.marker([v.lat, v.lng], { icon }).addTo(instanceRef.current)
-        .bindPopup(`<div style="font-family:Inter,sans-serif;padding:4px"><b style="font-size:13px">${v.name}</b><br><span style="color:#666;font-size:12px">${v.city}, ${v.country}</span><br><span style="color:#6366f1;font-size:12px;font-weight:600">★${v.rating} · Capacity ${v.capacity.toLocaleString()}</span></div>`);
-      if (onVenueClick) marker.on('click', () => onVenueClick(v));
-      markersRef.current.push(marker);
-    });
+    if (instanceRef.current && window.L) buildMarkers(instanceRef.current, venues);
   }, [venues]);
 
-  return <div ref={mapRef} style={{ height, width: '100%', borderRadius: 16, border: `1px solid ${C.border}`, overflow: 'hidden' }} />;
+  return (
+    <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(99,102,241,.2)' }}>
+      <div ref={mapRef} style={{ height, width: '100%' }} />
+    </div>
+  );
 }
