@@ -1,41 +1,39 @@
-/* EventIQ Global Styles */
 export const C = {
-  bg: '#05060f',
-  bg2: '#0a0c1c',
-  bg3: '#0f1221',
-  surface: '#131629',
-  border: 'rgba(99,102,241,0.15)',
-  border2: 'rgba(255,255,255,0.06)',
-  accent: '#6366f1',
-  accent2: '#8b5cf6',
-  accent3: '#06b6d4',
-  green: '#10b981',
-  amber: '#f59e0b',
-  red: '#ef4444',
-  text: '#f0f4ff',
-  muted: '#64748b',
-  muted2: '#94a3b8',
+  bg: '#05060f', bg2: '#0a0c1c', bg3: '#0f1221', surface: '#131629',
+  border: 'rgba(99,102,241,0.15)', border2: 'rgba(255,255,255,0.06)',
+  accent: '#6366f1', accent2: '#8b5cf6', accent3: '#06b6d4',
+  green: '#10b981', amber: '#f59e0b', red: '#ef4444',
+  text: '#f0f4ff', muted: '#64748b', muted2: '#94a3b8',
 };
 
 export const API = process.env.REACT_APP_API_URL || 'https://eventiq-backend.onrender.com';
 
-export const venues = [
-  { id: 1, name: 'Marina Bay Sands Expo', city: 'Singapore', country: 'Singapore', lat: 1.2834, lng: 103.8607, type: 'Convention Center', capacity: 5000, price: 8000, rating: 4.8, reviews: 342, views: 12400, image: '🏛️', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security'], description: 'World-class convention center at Marina Bay with stunning views and state-of-the-art facilities.' },
-  { id: 2, name: 'Chennai Trade Centre', city: 'Chennai', country: 'India', lat: 13.0474, lng: 80.2105, type: 'Trade Center', capacity: 3000, price: 2500, rating: 4.5, reviews: 218, views: 8900, image: '🏢', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment'], description: 'Premier trade and exhibition center in the heart of Chennai.' },
-  { id: 3, name: 'ExCeL London', city: 'London', country: 'UK', lat: 51.5074, lng: 0.0324, type: 'Exhibition Hall', capacity: 10000, price: 15000, rating: 4.7, reviews: 589, views: 23100, image: '🏟️', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security', 'Hotels nearby'], description: 'London\'s leading international venue with over 90,000 sq metres of flexible event space.' },
-  { id: 4, name: 'Dubai World Trade Centre', city: 'Dubai', country: 'UAE', lat: 25.2285, lng: 55.2849, type: 'Convention Center', capacity: 8000, price: 12000, rating: 4.9, reviews: 467, views: 19800, image: '🕌', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security', 'Concierge'], description: 'Middle East\'s most prestigious event venue at the center of global business.' },
-  { id: 5, name: 'Javits Center', city: 'New York', country: 'USA', lat: 40.7573, lng: -74.0021, type: 'Convention Center', capacity: 12000, price: 20000, rating: 4.6, reviews: 712, views: 31200, image: '🗽', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security', 'Rooftop'], description: 'New York\'s premier convention center on the Hudson River.' },
-  { id: 6, name: 'Pragati Maidan', city: 'New Delhi', country: 'India', lat: 28.6129, lng: 77.2436, type: 'Exhibition Hall', capacity: 15000, price: 3000, rating: 4.3, reviews: 298, views: 11600, image: '🏛️', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment'], description: 'India\'s largest exhibition and convention complex in New Delhi.' },
-  { id: 7, name: 'Tokyo Big Sight', city: 'Tokyo', country: 'Japan', lat: 35.6329, lng: 139.7949, type: 'Exhibition Hall', capacity: 20000, price: 18000, rating: 4.8, reviews: 534, views: 27300, image: '⛩️', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security'], description: 'Japan\'s largest convention complex, famous for its unique inverted pyramid structure.' },
-  { id: 8, name: 'Palais des Congrès', city: 'Paris', country: 'France', lat: 48.8985, lng: 2.2837, type: 'Convention Center', capacity: 4000, price: 11000, rating: 4.7, reviews: 389, views: 16700, image: '🗼', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security', 'Translation'], description: 'Iconic Paris convention center near the Arc de Triomphe.' },
-  { id: 9, name: 'ICC Sydney', city: 'Sydney', country: 'Australia', lat: -33.8748, lng: 151.1989, type: 'Convention Center', capacity: 8000, price: 13000, rating: 4.8, reviews: 423, views: 18900, image: '🦘', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security', 'Harbour views'], description: 'Australia\'s premier convention center overlooking Darling Harbour.' },
-  { id: 10, name: 'CTICC Cape Town', city: 'Cape Town', country: 'South Africa', lat: -33.9174, lng: 18.4204, type: 'Convention Center', capacity: 3500, price: 5000, rating: 4.6, reviews: 267, views: 9800, image: '🌍', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment'], description: 'Cape Town International Convention Centre with Table Mountain views.' },
-  { id: 11, name: 'Bombay Exhibition Centre', city: 'Mumbai', country: 'India', lat: 19.1197, lng: 72.8468, type: 'Exhibition Hall', capacity: 6000, price: 2800, rating: 4.4, reviews: 201, views: 8200, image: '🎭', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment'], description: 'Mumbai\'s largest exhibition and trade fair venue in Goregaon.' },
-  { id: 12, name: 'Feria de Madrid IFEMA', city: 'Madrid', country: 'Spain', lat: 40.4696, lng: -3.6082, type: 'Exhibition Hall', capacity: 18000, price: 14000, rating: 4.5, reviews: 512, views: 21400, image: '🇪🇸', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security', 'Hotels nearby'], description: 'Spain\'s international trade fair institution, one of Europe\'s largest.' },
-];
-
-export function wakeBackend() {
-  fetch(`${API}/`).catch(() => {});
-}
+export function wakeBackend() { fetch(`${API}/`).catch(() => {}); }
 
 export const eventTypes = ['Conference', 'Wedding', 'Corporate', 'Concert', 'Exhibition', 'Workshop', 'Gala Dinner', 'Sports Event', 'Festival', 'Product Launch'];
+
+export const venues = [
+  { id: 1, name: 'Marina Bay Sands', city: 'Singapore', country: 'Singapore', lat: 1.2834, lng: 103.8607, type: 'Convention Center', capacity: 5000, price: 8000, rating: 4.8, reviews: 342, views: 12400, image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=600&q=80', description: 'World-class convention center at Marina Bay with stunning skyline views and state-of-the-art facilities.', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security', 'Concierge'] },
+  { id: 2, name: 'Chennai Trade Centre', city: 'Chennai', country: 'India', lat: 13.0474, lng: 80.2105, type: 'Trade Center', capacity: 3000, price: 2500, rating: 4.5, reviews: 218, views: 8900, image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80', description: 'Premier trade and exhibition center in the heart of Chennai, ideal for large-scale events.', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment'] },
+  { id: 3, name: 'ExCeL London', city: 'London', country: 'UK', lat: 51.5074, lng: 0.0324, type: 'Exhibition Hall', capacity: 10000, price: 15000, rating: 4.7, reviews: 589, views: 23100, image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80', description: "London's leading international venue with over 90,000 sq metres of flexible event space.", amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security', 'Hotels nearby'] },
+  { id: 4, name: 'Dubai World Trade Centre', city: 'Dubai', country: 'UAE', lat: 25.2285, lng: 55.2849, type: 'Convention Center', capacity: 8000, price: 12000, rating: 4.9, reviews: 467, views: 19800, image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&q=80', description: "Middle East's most prestigious event venue at the center of global business.", amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security', 'Concierge'] },
+  { id: 5, name: 'Javits Center', city: 'New York', country: 'USA', lat: 40.7573, lng: -74.0021, type: 'Convention Center', capacity: 12000, price: 20000, rating: 4.6, reviews: 712, views: 31200, image: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?w=600&q=80', description: "New York's premier convention center on the Hudson River with rooftop garden.", amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security', 'Rooftop'] },
+  { id: 6, name: 'Bharat Mandapam Delhi', city: 'New Delhi', country: 'India', lat: 28.6129, lng: 77.2436, type: 'Exhibition Hall', capacity: 15000, price: 3000, rating: 4.3, reviews: 298, views: 11600, image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80', description: "India's largest convention complex in New Delhi, hosting world-class events.", amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment'] },
+  { id: 7, name: 'Tokyo Big Sight', city: 'Tokyo', country: 'Japan', lat: 35.6329, lng: 139.7949, type: 'Exhibition Hall', capacity: 20000, price: 18000, rating: 4.8, reviews: 534, views: 27300, image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&q=80', description: "Japan's largest convention complex famous for its unique inverted pyramid structure.", amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security'] },
+  { id: 8, name: 'Palais des Congres Paris', city: 'Paris', country: 'France', lat: 48.8985, lng: 2.2837, type: 'Convention Center', capacity: 4000, price: 11000, rating: 4.7, reviews: 389, views: 16700, image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80', description: 'Iconic Paris convention center near the Arc de Triomphe with world-class facilities.', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security', 'Translation'] },
+  { id: 9, name: 'ICC Sydney', city: 'Sydney', country: 'Australia', lat: -33.8748, lng: 151.1989, type: 'Convention Center', capacity: 8000, price: 13000, rating: 4.8, reviews: 423, views: 18900, image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80', description: "Australia's premier convention center overlooking Darling Harbour.", amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security', 'Harbour views'] },
+  { id: 10, name: 'CTICC Cape Town', city: 'Cape Town', country: 'South Africa', lat: -33.9174, lng: 18.4204, type: 'Convention Center', capacity: 3500, price: 5000, rating: 4.6, reviews: 267, views: 9800, image: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=600&q=80', description: 'Cape Town International Convention Centre with breathtaking Table Mountain views.', amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment'] },
+  { id: 11, name: 'Bombay Exhibition Centre', city: 'Mumbai', country: 'India', lat: 19.1197, lng: 72.8468, type: 'Exhibition Hall', capacity: 6000, price: 2800, rating: 4.4, reviews: 201, views: 8200, image: 'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?w=600&q=80', description: "Mumbai's largest exhibition and trade fair venue in Goregaon.", amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment'] },
+  { id: 12, name: 'IFEMA Madrid', city: 'Madrid', country: 'Spain', lat: 40.4696, lng: -3.6082, type: 'Exhibition Hall', capacity: 18000, price: 14000, rating: 4.5, reviews: 512, views: 21400, image: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&q=80', description: "Spain's international trade fair institution, one of Europe's largest venues.", amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment', 'Security', 'Hotels nearby'] },
+];
+
+export const vendors = [
+  { id: 1, name: 'Elite Catering Co.', service: 'Catering', cities: ['Singapore', 'Dubai', 'London'], price: '25-80 per person', rating: 4.8, reviews: 234, image: 'https://images.unsplash.com/photo-1555244162-803834f70033?w=400&q=80', description: 'Premium catering services for corporate and social events. International cuisine specialists.', contact: 'contact@elitecatering.com', phone: '+65 9123 4567' },
+  { id: 2, name: 'Capture Moments Studio', service: 'Photography', cities: ['Singapore', 'Mumbai', 'Chennai'], price: '$500-2500 per event', rating: 4.9, reviews: 189, image: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=400&q=80', description: 'Professional event photography and videography. Award-winning team with 10+ years experience.', contact: 'hello@capturemoments.com', phone: '+65 8234 5678' },
+  { id: 3, name: 'LuxDecor Events', service: 'Decoration', cities: ['Dubai', 'London', 'Paris', 'New York'], price: '$1000-8000 per event', rating: 4.7, reviews: 312, image: 'https://images.unsplash.com/photo-1478146896981-b80fe463b330?w=400&q=80', description: 'Luxury event decoration and floral arrangements. Transform any venue into a magical space.', contact: 'design@luxdecor.com', phone: '+44 20 7123 4567' },
+  { id: 4, name: 'SoundWave Pro', service: 'Lighting & Sound', cities: ['London', 'New York', 'Tokyo', 'Sydney'], price: '$800-5000 per event', rating: 4.6, reviews: 278, image: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400&q=80', description: 'State-of-the-art audio-visual and lighting solutions for concerts, conferences, and corporate events.', contact: 'bookings@soundwavepro.com', phone: '+1 212 555 0100' },
+  { id: 5, name: 'SecureGuard Events', service: 'Security', cities: ['Dubai', 'Singapore', 'London', 'New York', 'Sydney'], price: '$200-1500 per event', rating: 4.5, reviews: 167, image: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=400&q=80', description: 'Licensed security personnel for all event types. Crowd management and access control specialists.', contact: 'ops@secureguard.com', phone: '+65 6789 0123' },
+  { id: 6, name: 'Spice Route Catering', service: 'Catering', cities: ['Chennai', 'Mumbai', 'New Delhi', 'Singapore'], price: '15-50 per person', rating: 4.7, reviews: 298, image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80', description: 'Authentic Indian and Asian cuisine for corporate events, weddings, and social gatherings.', contact: 'orders@spiceroute.in', phone: '+91 98765 43210' },
+  { id: 7, name: 'Frame Perfect', service: 'Photography', cities: ['New York', 'London', 'Paris', 'Madrid'], price: '$800-4000 per event', rating: 4.8, reviews: 445, image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80', description: 'Creative event photography with same-day delivery option. Corporate and social event specialists.', contact: 'studio@frameperfect.com', phone: '+1 646 555 0200' },
+  { id: 8, name: 'Aurora Designs', service: 'Decoration', cities: ['Tokyo', 'Singapore', 'Sydney', 'Mumbai'], price: '$500-4000 per event', rating: 4.6, reviews: 156, image: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=400&q=80', description: 'Modern minimalist event design with a focus on sustainable materials and stunning visuals.', contact: 'hello@auroradesigns.co', phone: '+65 9876 5432' },
+];
