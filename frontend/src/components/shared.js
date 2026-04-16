@@ -111,7 +111,15 @@ function ChatPanel({ onClose }) {
 
   useEffect(() => { end.current?.scrollIntoView({ behavior: 'smooth' }); }, [msgs]);
   useEffect(() => {
-    fetch(`${API}/`).finally(() => setWaking(false));
+    // Wake up Render server - free tier sleeps after 15 mins inactivity
+    const wakeController = new AbortController();
+    const wakeTimer = setTimeout(() => wakeController.abort(), 15000);
+    fetch(`${API}/`, { signal: wakeController.signal })
+      .then(() => { clearTimeout(wakeTimer); setWaking(false); })
+      .catch(() => { clearTimeout(wakeTimer); setWaking(false); });
+    // Also stop showing "connecting" after 8s regardless
+    const fallback = setTimeout(() => setWaking(false), 8000);
+    return () => { clearTimeout(fallback); wakeController.abort(); };
   }, []);
 
   const send = async (text) => {
@@ -120,18 +128,35 @@ function ChatPanel({ onClose }) {
     const history = msgs.map(m => ({ role: m.r === 'user' ? 'user' : 'assistant', content: m.t }));
     setMsgs(p => [...p, { r: 'user', t: msg }]);
     setInp(''); setBusy(true);
+
+    // Compatible timeout using AbortController (works in all browsers)
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 45000);
+
     try {
       const res = await fetch(`${API}/api/chatbot/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: msg, messages: history }),
-        signal: AbortSignal.timeout(30000)
+        signal: controller.signal
       });
-      if (!res.ok) throw new Error('Server error');
+      clearTimeout(timer);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       const d = await res.json();
-      setMsgs(p => [...p, { r: 'bot', t: d.reply }]);
+      if (d.reply) {
+        setMsgs(p => [...p, { r: 'bot', t: d.reply }]);
+      } else {
+        throw new Error('Empty response');
+      }
     } catch (e) {
-      setMsgs(p => [...p, { r: 'bot', t: e.name === 'AbortError' ? 'The server is warming up (free tier takes ~30s). Please try again!' : 'Connection error. Please check your internet and try again.' }]);
+      clearTimeout(timer);
+      if (e.name === 'AbortError') {
+        setMsgs(p => [...p, { r: 'bot', t: 'The server is still warming up (Render free tier). Please wait 30 seconds and try again — it will work!' }]);
+      } else if (e.message && e.message.includes('HTTP')) {
+        setMsgs(p => [...p, { r: 'bot', t: 'Server returned an error. Please check that OPENAI_API_KEY is set correctly in your Render environment variables.' }]);
+      } else {
+        setMsgs(p => [...p, { r: 'bot', t: 'Could not reach the server. Make sure your Render backend is running at: ' + API }]);
+      }
     }
     setBusy(false);
   };
