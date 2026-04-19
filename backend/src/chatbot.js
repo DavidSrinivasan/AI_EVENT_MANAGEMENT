@@ -2,62 +2,81 @@ const express = require('express');
 const axios = require('axios');
 const router = express.Router();
 
-// Using Groq — 100% FREE, no credit card needed
-// Sign up at: https://console.groq.com
-// Free tier: 14,400 requests per day
-
-const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-
-const SYSTEM_PROMPT = `You are EventIQ's intelligent AI assistant for a global event management platform. You help users with:
-- Finding and recommending venues worldwide based on location, capacity, budget, and event type
-- Event planning advice including timelines, checklists, and budgets
-- Answering questions about venue features, pricing, and availability
-- ROI and financial analysis for events
-- General event management best practices
-Be helpful, specific, and concise. When recommending venues, mention realistic options for the city or country mentioned. Keep answers to 2-4 sentences.`;
+const SYSTEM_PROMPT = `You are EventIQ's helpful AI assistant for event planning. Help users find venues, plan events, estimate budgets, and analyze ROI. Be concise and helpful. Keep answers to 2-3 sentences.`;
 
 router.post('/chat', async (req, res) => {
     const { message, messages } = req.body;
 
+    console.log('Chat request received:', message);
+    console.log('GROQ_API_KEY exists:', !!process.env.GROQ_API_KEY);
+    console.log('Key starts with:', process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.substring(0, 8) : 'MISSING');
+
     if (!process.env.GROQ_API_KEY) {
+        console.log('ERROR: No GROQ_API_KEY found');
         return res.json({
-            reply: "AI service not configured. Please add GROQ_API_KEY to your Render environment variables. Get a free key at console.groq.com"
+            reply: "GROQ_API_KEY is missing. Please add it to Render environment variables."
         });
     }
 
     try {
-        const history = (messages || []).slice(-8).map(m => ({
+        const history = (messages || []).slice(-6).map(m => ({
             role: m.role === 'user' ? 'user' : 'assistant',
-            content: m.content
+            content: String(m.content)
         }));
 
-        const response = await axios.post(
-            GROQ_API_URL,
-            {
+        console.log('Calling Groq API...');
+
+        const response = await axios({
+            method: 'POST',
+            url: 'https://api.groq.com/openai/v1/chat/completions',
+            headers: {
+                'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            data: {
                 model: 'llama3-8b-8192',
                 messages: [
                     { role: 'system', content: SYSTEM_PROMPT },
                     ...history,
                     { role: 'user', content: message || 'Hello' }
                 ],
-                max_tokens: 250,
+                max_tokens: 200,
                 temperature: 0.7
             },
-            {
-                headers: {
-                    'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                timeout: 20000
-            }
-        );
+            timeout: 25000
+        });
 
+        console.log('Groq response status:', response.status);
         const reply = response.data?.choices?.[0]?.message?.content;
+        console.log('Reply generated:', reply ? reply.substring(0, 50) : 'EMPTY');
+
         res.json({ reply: reply || "I couldn't generate a response. Please try again!" });
 
     } catch (err) {
-        console.error('Groq error:', err?.response?.data || err.message);
-        res.json({ reply: "I'm temporarily unavailable. Please try again in a moment!" });
+        const status = err?.response?.status;
+        const errData = err?.response?.data;
+        const errMsg = err?.message;
+
+        console.error('Groq API Error:');
+        console.error('Status:', status);
+        console.error('Data:', JSON.stringify(errData));
+        console.error('Message:', errMsg);
+
+        let userMsg = "I'm temporarily unavailable. Please try again!";
+
+        if (status === 401) {
+            userMsg = "Invalid API key. Please check your GROQ_API_KEY in Render environment variables.";
+        } else if (status === 429) {
+            userMsg = "Rate limit reached. Please wait a moment and try again.";
+        } else if (status === 400) {
+            userMsg = "Bad request to AI service. Please try again.";
+        } else if (errMsg && errMsg.includes('timeout')) {
+            userMsg = "Request timed out. Please try again.";
+        } else if (errMsg && errMsg.includes('ECONNREFUSED')) {
+            userMsg = "Cannot connect to AI service. Please check network settings.";
+        }
+
+        res.json({ reply: userMsg });
     }
 });
 
